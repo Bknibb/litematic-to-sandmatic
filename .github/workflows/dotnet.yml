@@ -63,7 +63,7 @@ jobs:
             echo "✅ Version matches."
           fi
   build:
-
+    needs: detect
     runs-on: ubuntu-latest
 
     steps:
