@@ -10,6 +10,58 @@ on:
     branches: [ "master" ]
 
 jobs:
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      is_release: ${{ steps.extract_version.outputs.is_release }}
+      version: ${{ steps.extract_version.outputs.version }}
+      description: ${{ steps.extract_version.outputs.description }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Determine if commit is a release
+        id: extract_version
+        run: |
+          msg="${{ github.event.head_commit.message }}"
+
+          # Extract version
+          if [[ "$msg" =~ release[[:space:]]v([0-9]+\.[0-9]+\.[0-9]+) ]]; then
+            version="v${BASH_REMATCH[1]}"
+            echo "is_release=true" >> $GITHUB_OUTPUT
+            echo "version=$version" >> $GITHUB_OUTPUT
+          else
+            echo "is_release=false" >> $GITHUB_OUTPUT
+          fi
+
+          # Always output description
+          description="$(echo "$msg" | tail -n +2)"
+          {
+            echo "description<<EOF"
+            echo "$description"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+      - name: Validate version in litematic to sandmatic.csproj
+        if: steps.extract_version.outputs.is_release == 'true'
+        run: |
+          expected_version="${{ steps.extract_version.outputs.version }}" # e.g., v1.0.0
+          csproj_version=$(grep -oPm1 "(?<=<Version>)[^<]+" "litematic to sandmatic.csproj")
+          mod_version="v${csproj_version}"
+
+          echo "Expected version from commit: $expected_version"
+          echo "Version in gradle.properties: $mod_version"
+
+          if [ "$expected_version" != "$mod_version" ]; then
+            echo "❌ Version mismatch!"
+            echo "Expected: $expected_version"
+            echo "Found in gradle.properties: $mod_version"
+            exit 1
+          else
+            echo "✅ Version matches."
+          fi
   build:
 
     runs-on: ubuntu-latest
@@ -30,4 +82,19 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: build win-x64
-        path: /home/runner/work/litematic-to-sandmatic/litematic-to-sandmatic/bin/Debug/net8.0-windows/win-x64
+        path: ./bin/Debug/net8.0-windows/win-x64
+    - name: Zip For Release
+      if: needs.detect.outputs.is_release == 'true'
+      run: |
+        zip -r "litematic to sandmatic win-x64.zip" ./bin/Debug/net8.0-windows/win-x64
+    - name: Release
+      if: needs.detect.outputs.is_release == 'true'
+      uses: softprops/action-gh-release@v2
+      with:
+        token: '${{ secrets.GITHUB_TOKEN }}'
+        tag_name: ${{ needs.detect.outputs.version }}
+        prerelease: false
+        name: Release ${{ needs.detect.outputs.version }}
+        body: ${{ needs.detect.outputs.description }}
+        files: |
+          litematic to sandmatic win-x64.zip
