@@ -90,8 +90,8 @@ class Program
             Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
         });
 
-        const int maxSize = 4 * 1024 * 1024;
-        if (Encoding.UTF8.GetByteCount(output) > maxSize)
+        const int maxSize = 200000;
+        if (output.Length > maxSize)
         {
             MessageBox.Show("The output sandmatic is too large, please try a smaller schematic", "Sandmatic Too Big", MessageBoxButtons.OK, MessageBoxIcon.Error);
             throw new Exception("The output sandmatic is too large, please try a smaller schematic");
