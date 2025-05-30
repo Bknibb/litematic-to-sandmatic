@@ -27,7 +27,7 @@ jobs:
     - name: Test
       run: dotnet test --no-build --verbosity normal
     - name: Uploading dist
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
-        name: artefact
+        name: build
         path: ./litematic-to-sandmatic/bin/Debug/net8.0-windows/
