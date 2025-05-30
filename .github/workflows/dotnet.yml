@@ -29,5 +29,5 @@ jobs:
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: build
-        path: /home/runner/work/litematic-to-sandmatic/litematic-to-sandmatic/bin/Debug/net8.0-windows/
+        name: build win-x64
+        path: /home/runner/work/litematic-to-sandmatic/litematic-to-sandmatic/bin/Debug/net8.0-windows/win-x64
