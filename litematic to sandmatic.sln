@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.36105.23 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "litematic to sandmatic", "litematic to sandmatic.csproj", "{019E5E5D-C021-4D65-AE3C-491450756056}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{019E5E5D-C021-4D65-AE3C-491450756056}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{019E5E5D-C021-4D65-AE3C-491450756056}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{019E5E5D-C021-4D65-AE3C-491450756056}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{019E5E5D-C021-4D65-AE3C-491450756056}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C053861E-19D2-4CD3-BFAA-3FD14EE5949E}
+	EndGlobalSection
+EndGlobal
