@@ -73,7 +73,7 @@ class Program
         if (!IsCacheValid(cachedData))
         {
             string? latestRelease = await GetLatestReleaseAsync();
-            if (latestRelease != null && new Version(latestRelease) > Version)
+            if (latestRelease != null && new Version(latestRelease.Substring(1)) > Version)
             {
                 Console.WriteLine($"Update Available: {latestRelease}");
                 Console.WriteLine($"https://github.com/Bknibb/litematic-to-sandmatic/releases");
