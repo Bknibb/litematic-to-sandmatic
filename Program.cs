@@ -103,7 +103,7 @@ class Program
         Region reg = schem.Regions.Values.First();
 
         var outDict = new Dictionary<string, object>();
-        outDict["PosEnd"] = $"{reg.maxX()},{reg.maxY()},{reg.maxZ()}";
+        //outDict["PosEnd"] = $"{reg.maxX()},{reg.maxY()},{reg.maxZ()}";
         string name = String.IsNullOrEmpty(schem.name) ? Path.GetFileNameWithoutExtension(file) : schem.name;
         if (name.Length > 30)
         {
@@ -112,7 +112,7 @@ class Program
             name = name.Substring(0, 30);
         }
         outDict["Name"] = name;
-        outDict["Time"] = (int)(schem.created / 1000);
+        //outDict["Time"] = (int)(schem.created / 1000);
 
         var data = new List<Dictionary<string, object>>();
 
@@ -159,7 +159,7 @@ class Program
         }
 
         outDict["Data"] = data;
-        outDict["PosStart"] = $"{-reg.minX()},{reg.minY()},{-reg.minZ()}";
+        //outDict["PosStart"] = $"{-reg.minX()},{reg.minY()},{-reg.minZ()}";
 
         string output = JsonSerializer.Serialize(outDict, new JsonSerializerOptions
         {
