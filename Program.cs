@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -83,7 +82,7 @@ class Program
             }
         }
     }
-    [STAThread] // Required for file dialogs and clipboard
+    [STAThread]
     static void Main()
     {
         var updateCheckTask = UpdateCheck();
