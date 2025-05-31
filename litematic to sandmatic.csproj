@@ -9,7 +9,8 @@
 	<UseWindowsForms>true</UseWindowsForms>
 	<EnableWindowsTargeting>true</EnableWindowsTargeting>
 	<RuntimeIdentifier>win-x64</RuntimeIdentifier>
-	<Version>1.1.1</Version>
+	<Version>1.1.2</Version>
+	<IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>
 
   <ItemGroup>
