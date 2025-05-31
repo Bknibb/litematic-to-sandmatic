@@ -6,6 +6,8 @@ using System.Drawing;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Windows.Forms;
@@ -14,9 +16,78 @@ using Region = litematic_to_sandmatic.LitematicaCS.Region;
 
 class Program
 {
+    private static readonly HttpClient client = new HttpClient();
+    private const string owner = "Bknibb";
+    private const string repo = "litematic-to-sandmatic";
+    public static Assembly assembly = Assembly.GetEntryAssembly();
+    private static FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
+    private static string ProductName = versionInfo.ProductName;
+    private static string ProductVersion = versionInfo.ProductVersion;
+    private static Version Version = new Version(ProductVersion);
+    private const string CacheFile = "release_cache.json";
+    public class CacheData
+    {
+        public DateTime LastChecked { get; set; }
+    }
+    public static async Task<CacheData?> LoadCacheAsync()
+    {
+        if (!File.Exists(CacheFile)) return null;
+
+        var json = await File.ReadAllTextAsync(CacheFile);
+        return JsonSerializer.Deserialize<CacheData>(json);
+    }
+
+    public static async Task SaveCacheAsync(CacheData data)
+    {
+        var json = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true });
+        await File.WriteAllTextAsync(CacheFile, json);
+    }
+
+    public static bool IsCacheValid(CacheData? data)
+    {
+        return data != null && (DateTime.UtcNow - data.LastChecked).TotalHours < 1;
+    }
+
+    public static async Task<string?> GetLatestReleaseAsync()
+    {
+        client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(ProductName.Replace(" ", "-"), ProductVersion));
+
+        var url = $"https://api.github.com/repos/{owner}/{repo}/releases/latest";
+
+        var response = await client.GetAsync(url);
+        if (!response.IsSuccessStatusCode)
+        {
+            Console.WriteLine($"Error fetching latest release: {response.StatusCode}");
+            return null;
+        }
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        using var jsonDoc = JsonDocument.Parse(content);
+        var tagName = jsonDoc.RootElement.GetProperty("tag_name").GetString();
+
+        return tagName;
+    }
+    static async Task UpdateCheck()
+    {
+        var cachedData = await LoadCacheAsync();
+        if (!IsCacheValid(cachedData))
+        {
+            string? latestRelease = await GetLatestReleaseAsync();
+            if (latestRelease != null && new Version(latestRelease) > Version)
+            {
+                Console.WriteLine($"Update Available: {latestRelease}");
+                Console.WriteLine($"https://github.com/Bknibb/litematic-to-sandmatic/releases");
+                MessageBox.Show($"Update Available: {latestRelease}", "Update Available", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                await SaveCacheAsync(new CacheData { LastChecked = DateTime.UtcNow });
+            }
+        }
+    }
     [STAThread] // Required for file dialogs and clipboard
     static void Main()
     {
+        var updateCheckTask = UpdateCheck();
+        updateCheckTask.Wait();
         using var openFileDialog = new OpenFileDialog
         {
             Filter = "Litematica (*.litematic)|*.litematic",
@@ -51,7 +122,7 @@ class Program
             {
                 ["p"] = $"{bpos.X},{bpos.Y},{bpos.Z}",
                 ["b"] = bid,
-                ["r"] = "u"
+                //["r"] = "u"
             };
 
             if (baxis == "x") blockDict["r"] = "f";
