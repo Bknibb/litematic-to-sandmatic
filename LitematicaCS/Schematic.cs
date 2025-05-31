@@ -127,10 +127,16 @@ namespace litematic_to_sandmatic.LitematicaCS
                 lmSubversion = subversionTag.Value;
             }
             int mcVersion = nbt.Get<IntTag>("MinecraftDataVersion");
-            CompoundTag enclosingSize = meta.Get<CompoundTag>("EnclosingSize");
-            int width = enclosingSize.Get<IntTag>("x").Value;
-            int height = enclosingSize.Get<IntTag>("y").Value;
-            int length = enclosingSize.Get<IntTag>("z").Value;
+            int width = 0;
+            int height = 0;
+            int length = 0;
+            if (meta.ContainsKey("EnclosingSize"))
+            {
+                CompoundTag enclosingSize = meta.Get<CompoundTag>("EnclosingSize");
+                width = enclosingSize.Get<IntTag>("x").Value;
+                height = enclosingSize.Get<IntTag>("y").Value;
+                length = enclosingSize.Get<IntTag>("z").Value;
+            }
             string author = meta.Get<StringTag>("Author").Value;
             string name = meta.Get<StringTag>("Name").Value;
             string desc = meta.Get<StringTag>("Description").Value;
@@ -144,15 +150,15 @@ namespace litematic_to_sandmatic.LitematicaCS
                 }
             }
             Schematic schematic = new Schematic(name: name, author: author, description: desc, regions: regions, lmVersion: lmVersion, lmSubversion: lmSubversion, mcVersion: mcVersion);
-            if (schematic.width != width)
+            if (meta.ContainsKey("EnclosingSize") && schematic.width != width)
             {
                 throw new CorruptedSchematicError($"Invalid schematic width in metadata, excepted {schematic.width} was {width}");
             }
-            if (schematic.height != height)
+            if (meta.ContainsKey("EnclosingSize") && schematic.height != height)
             {
                 throw new CorruptedSchematicError($"Invalid schematic height in metadata, excepted {schematic.height} was {height}");
             }
-            if (schematic.length != length)
+            if (meta.ContainsKey("EnclosingSize") && schematic.length != length)
             {
                 throw new CorruptedSchematicError($"Invalid schematic length in metadata, excepted {schematic.length} was {length}");
             }

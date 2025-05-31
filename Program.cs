@@ -30,11 +30,17 @@ class Program
 
         Schematic schem = Schematic.load(file);
         Region reg = schem.Regions.Values.First();
-        Debug.WriteLine(reg.Palette.Count);
 
         var outDict = new Dictionary<string, object>();
         outDict["PosEnd"] = $"{reg.maxX()},{reg.maxY()},{reg.maxZ()}";
-        outDict["Name"] = schem.name;
+        string name = String.IsNullOrEmpty(schem.name) ? Path.GetFileNameWithoutExtension(file) : schem.name;
+        if (name.Length > 30)
+        {
+            MessageBox.Show("The name is too long, it will be trimmed", "Name Too Long", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            Console.WriteLine("The name is too long, it will be trimmed");
+            name = name.Substring(0, 30);
+        }
+        outDict["Name"] = name;
         outDict["Time"] = (int)(schem.created / 1000);
 
         var data = new List<Dictionary<string, object>>();
@@ -82,7 +88,7 @@ class Program
         }
 
         outDict["Data"] = data;
-        outDict["PosStart"] = $"{-reg.minX()},{reg.minY()},{reg.minZ()}";
+        outDict["PosStart"] = $"{-reg.minX()},{reg.minY()},{-reg.minZ()}";
 
         string output = JsonSerializer.Serialize(outDict, new JsonSerializerOptions
         {
